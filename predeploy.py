@@ -6,7 +6,7 @@ GITHUB_RELEASE_URL = "https://github.com/meesam4687/epithet-backend/releases/dow
 
 # Define the target directory and file path
 MODEL_DIR = "models"
-MODEL_FILE_PATH = os.path.join(MODEL_DIR, "your-model-file")
+MODEL_FILE_PATH = os.path.join(MODEL_DIR, "model.safetensors")
 
 # Create the models directory if it doesn't exist
 os.makedirs(MODEL_DIR, exist_ok=True)
