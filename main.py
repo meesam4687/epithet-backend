@@ -9,7 +9,7 @@ def generate():
     data = flask.request.json
     prompt = data['prompt']
     id = data['userID']
-    return message(prompt, id)
+    return {"response": message(prompt, id)}
 
 if __name__ == '__main__':
     app.run(debug=True)
