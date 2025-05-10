@@ -11,8 +11,22 @@ from databaseFunctions import getUser
 def generate():
     data = flask.request.json
     prompt = data['prompt']
-    id = data['userID']
-    return {"response": message(prompt, id)}
+    id = data['username']
+    user = getUser(data["username"])
+    key = derive_key(data["password"], user["password"]["salt"])
+    decrypted_token = decrypt_token(user["password"]["encrypted_token"], key, user["password"]["iv"])
+    if decrypted_token:
+        if isinstance(decrypted_token, bytes):
+            import base64
+            decrypted_token = base64.b64encode(decrypted_token).decode('ascii')
+        if(data["token"] == decrypted_token):
+                return {"response": message(prompt, id)}
+        else:
+            return {"status": "failed"}
+    else:
+        return {"status": "failed"}
+
+    
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -30,6 +44,27 @@ def login():
             return {"status": "failed"}
     except Exception as e:
         print("Error during login process:", e)
+        return {"status": "failed"}
+    
+@app.route('/auth', methods=['POST'])
+def auth():
+    data = flask.request.json
+    try:
+        user = getUser(data["username"])
+        key = derive_key(data["password"], user["password"]["salt"])
+        decrypted_token = decrypt_token(user["password"]["encrypted_token"], key, user["password"]["iv"])
+        if decrypted_token:
+            if isinstance(decrypted_token, bytes):
+                import base64
+                decrypted_token = base64.b64encode(decrypted_token).decode('ascii')
+            if(data["token"] == decrypted_token):
+                return {"status": "ok"}
+            else:
+                return {"status": "failed"}
+        else:
+            return {"status": "failed"}
+    except Exception as e:
+        print("Error during auth process:", e)
         return {"status": "failed"}
 
 @app.route('/signup', methods=['POST'])
