@@ -8,6 +8,7 @@ WORKDIR /app
 COPY . /app
 
 # Install dependencies
+RUN pip install -r requirements.txt
 RUN pip install --no-cache-dir flask flask_cors gunicorn requests
 
 # Run pre-deploy script to download the model
@@ -16,5 +17,6 @@ RUN python predeploy.py
 # Expose port 7860 (Hugging Face Spaces default)
 EXPOSE 7860
 
-# Run the Flask app (change from app.py to main.py)
-CMD ["gunicorn", "-b", "0.0.0.0:7860", "main:app"]
+# Run the Flask app with optimized gunicorn settings
+CMD ["gunicorn", "--workers=2", "--threads=2", "--timeout=600", "-b", "0.0.0.0:7860", "main:app"]
+
